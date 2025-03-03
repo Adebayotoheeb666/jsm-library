@@ -9,10 +9,10 @@ interface Book {
   description: string;
   coverColor: string;
   coverUrl: string;
-  videoUrl: string;
+  video?: string;
   summary: string;
-  createdAt: Date | null;
 }
+
 
 interface AuthCredentials {
   fullName: string;

@@ -1,9 +1,10 @@
-import NextAuth, { User } from "next-auth";
-import { compare } from "bcryptjs";
+import NextAuth, { User, Session } from "next-auth";
+import { JWT } from "next-auth/jwt"; // Correct import for JWT
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "@/database/drizzle";
 import { users } from "@/database/schema";
 import { eq } from "drizzle-orm";
+import { compare } from "bcryptjs";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
@@ -16,18 +17,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
+        const email = credentials.email.toString();
+        const password = credentials.password.toString();
+
         const user = await db
           .select()
           .from(users)
-          .where(eq(users.email, credentials.email.toString()))
+          .where(eq(users.email, email))
           .limit(1);
 
         if (user.length === 0) return null;
 
-        const isPasswordValid = await compare(
-          credentials.password.toString(),
-          user[0].password,
-        );
+        const isPasswordValid = await compare(password, user[0].password);
 
         if (!isPasswordValid) return null;
 

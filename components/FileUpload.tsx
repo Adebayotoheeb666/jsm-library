@@ -2,7 +2,6 @@
 
 import { IKImage, ImageKitProvider, IKUpload, IKVideo } from "imagekitio-next";
 import config from "@/lib/config";
-import ImageKit from "imagekit";
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
@@ -159,7 +158,7 @@ const FileUpload = ({
 
         <p className={cn("text-base", styles.placeholder)}>{placeholder}</p>
 
-        {file && (
+        {file.filePath && (
           <p className={cn("upload-filename", styles.text)}>{file.filePath}</p>
         )}
       </button>
@@ -172,17 +171,17 @@ const FileUpload = ({
         </div>
       )}
 
-      {file &&
+      {file.filePath &&
         (type === "image" ? (
           <IKImage
-            alt={file.filePath}
-            path={file.filePath}
+            alt={file.filePath} // Ensure alt is a string
+            path={file.filePath} // Ensure path is a string
             width={500}
             height={300}
           />
         ) : type === "video" ? (
           <IKVideo
-            path={file.filePath}
+            path={file.filePath} // Ensure path is a string
             controls={true}
             className="h-96 w-full rounded-xl"
           />

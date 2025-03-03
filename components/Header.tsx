@@ -1,9 +1,21 @@
+"use client"; // Mark as a client component
+
 import Link from "next/link";
 import Image from "next/image";
-import { signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { signOut } from "next-auth/react"; // Use next-auth/react for client-side sign-out
+import { Session } from "next-auth"; // Import Session type
 
-const Header = () => {
+type HeaderProps = {
+  session: Session | null; // Accept session as a prop
+};
+
+const Header = ({ session }: HeaderProps) => {
+  // Handle sign-out on the client side
+  const handleSignOut = async () => {
+    await signOut({ redirect: true, callbackUrl: "/sign-in" });
+  };
+
   return (
     <header className="my-10 flex justify-between gap-5">
       <Link href="/">
@@ -11,18 +23,11 @@ const Header = () => {
       </Link>
 
       <ul className="flex flex-row items-center gap-8">
-        <li>
-          <form
-            action={async () => {
-              "use server";
-
-              await signOut();
-            }}
-            className="mb-10"
-          >
-            <Button>Logout</Button>
-          </form>
-        </li>
+        {session && ( // Only show logout button if session exists
+          <li>
+            <Button onClick={handleSignOut}>Logout</Button>
+          </li>
+        )}
       </ul>
     </header>
   );
