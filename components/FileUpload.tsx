@@ -35,6 +35,7 @@ const authenticator = async () => {
   }
 };
 
+
 interface Props {
   type: "image" | "video";
   accept: string;

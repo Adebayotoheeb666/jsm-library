@@ -1,4 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+// app/api/auth/imagekit/route.ts
+import { NextResponse } from "next/server";
 import ImageKit from "imagekit";
 
 // Import environment variables with default values
@@ -13,28 +14,27 @@ const imagekit = new ImageKit({
   urlEndpoint,
 });
 
-// API route handler for /api/auth/imagekit
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  // Check for GET request method
-  if (req.method !== "GET") {
-    // Return 405 Method Not Allowed if request method is not GET
-    return res.status(405).json({ message: "Method not allowed" });
-  }
-
+// Handle GET requests
+export async function GET() {
   try {
     // Generate an authentication parameters object for ImageKit
     const authenticationParameters = imagekit.getAuthenticationParameters();
 
     // Return the authentication parameters as JSON
-    res.status(200).json(authenticationParameters);
+    return NextResponse.json(authenticationParameters);
   } catch (error) {
     // Log any errors that occur
     console.error("Error:", error);
 
     // Return 500 Internal Server Error if there's an error
-    res.status(500).json({ message: "Internal Server Error" });
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
+
+// Optionally, you can export other HTTP methods if needed
+// export async function POST() { ... }
+// export async function PUT() { ... }
+// export async function DELETE() { ... }
