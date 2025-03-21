@@ -33,8 +33,3 @@ export async function GET() {
     );
   }
 }
-
-// Optionally, you can export other HTTP methods if needed
-// export async function POST() { ... }
-// export async function PUT() { ... }
-// export async function DELETE() { ... }

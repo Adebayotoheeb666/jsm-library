@@ -24,9 +24,9 @@ const bebasNeue = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "BookWise",
+  title: "PrepPal",
   description:
-    "BookWise is a book borrowing university library management solution.",
+    "PrepPal is an exam scheduler, reminder and a book borrowing university library management solution.",
 };
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
