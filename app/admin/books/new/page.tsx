@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import BookForm from "@/components/admin/forms/BookForm";
+import ExamForm from "@/components/admin/forms/ExamForm"; // Updated to use ExamForm
 
 const Page = () => {
   return (
@@ -11,9 +11,10 @@ const Page = () => {
       </Button>
 
       <section className="w-full max-w-2xl">
-        <BookForm />
+        <ExamForm /> {/* Changed from BookForm to ExamForm */}
       </section>
     </>
   );
 };
+
 export default Page;

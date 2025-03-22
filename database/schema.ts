@@ -1,69 +1,66 @@
-import {
-  varchar,
-  uuid,
-  integer,
-  text,
-  pgTable,
-  date,
-  pgEnum,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core"; // Adjust based on your ORM
+import { z } from "zod";
 
-export const STATUS_ENUM = pgEnum("status", [
-  "PENDING",
-  "APPROVED",
-  "REJECTED",
-]);
-export const ROLE_ENUM = pgEnum("role", ["USER", "ADMIN"]);
-export const BORROW_STATUS_ENUM = pgEnum("borrow_status", [
-  "BORROWED",
-  "RETURNED",
-]);
-
-export const users = pgTable("users", {
-  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
-  fullName: varchar("full_name", { length: 255 }).notNull(),
-  email: text("email").notNull().unique(),
-  universityId: integer("university_id").notNull().unique(),
-  password: text("password").notNull(),
-  universityCard: text("university_card").notNull(),
-  status: STATUS_ENUM("status").default("PENDING"),
-  role: ROLE_ENUM("role").default("USER"),
-  lastActivityDate: date("last_activity_date").defaultNow(),
-  createdAt: timestamp("created_at", {
-    withTimezone: true,
-  }).defaultNow(),
+// Define the examinations schema
+export const examinations = pgTable("examinations", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  date: timestamp("date").notNull(),
+  time: text("time").notNull(),
 });
 
+// Define the books schema
 export const books = pgTable("books", {
-  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
-  title: varchar("title", { length: 255 }).notNull(),
-  author: varchar("author", { length: 255 }).notNull(),
-  genre: text("genre").notNull(),
-  rating: integer("rating").notNull(),
-  coverUrl: text("cover_url").notNull(),
-  coverColor: varchar("cover_color", { length: 7 }).notNull(),
-  description: text("description").notNull(),
-  totalCopies: integer("total_copies").notNull().default(1),
-  availableCopies: integer("available_copies").notNull().default(0),
-  videoUrl: text("video_url").notNull(),
-  summary: varchar("summary").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  author: text("author").notNull(),
+  publishedDate: timestamp("published_date").notNull(),
 });
 
-export const borrowRecords = pgTable("borrow_records", {
-  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
-  userId: uuid("user_id")
-    .references(() => users.id)
-    .notNull(),
-  bookId: uuid("book_id")
-    .references(() => books.id)
-    .notNull(),
-  borrowDate: timestamp("borrow_date", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  dueDate: date("due_date").notNull(),
-  returnDate: date("return_date"),
-  status: BORROW_STATUS_ENUM("status").default("BORROWED").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+// Define the users schema
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(), // Added password field
 });
+
+// Define the borrowRecords schema
+export const borrowRecords = pgTable("borrow_records", {
+  id: serial("id").primaryKey(),
+  userId: serial("user_id").notNull(),
+  bookId: serial("book_id").notNull(),
+  borrowDate: timestamp("borrow_date").notNull(),
+  returnDate: timestamp("return_date"),
+});
+
+// Zod schemas for validation
+export const ExaminationSchema = z.object({
+  title: z.string().min(1),
+  date: z.string(), // Consider using a date type if applicable
+  time: z.string(), // Consider using a time type if applicable
+});
+
+export const BookSchema = z.object({
+  title: z.string().min(1),
+  author: z.string().min(1),
+  publishedDate: z.string(), // Consider using a date type if applicable
+});
+
+export const UserSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+});
+
+export const BorrowRecordSchema = z.object({
+  userId: z.number(),
+  bookId: z.number(),
+  borrowDate: z.string(), // Consider using a date type if applicable
+  returnDate: z.string().nullable(),
+});
+
+// Export the schemas for use in the database operations
+export type Examination = z.infer<typeof ExaminationSchema>;
+export type Book = z.infer<typeof BookSchema>;
+export type User = z.infer<typeof UserSchema>;
+export type BorrowRecord = z.infer<typeof BorrowRecordSchema>;

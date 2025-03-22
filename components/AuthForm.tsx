@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { FIELD_NAMES, FIELD_TYPES } from "@/constants";
-import { toast } from "@/hooks/use-toast"; // Corrected import statement
+import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import Link from "next/link"; // Ensure Link is imported
+import Link from "next/link";
 import FileUpload from "./FileUpload";
 
 interface FormValues {
@@ -85,7 +85,7 @@ const AuthForm = ({
           <FormField
             control={form.control}
             name="role"
-            render={({ field }: { field: any }) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>User Type</FormLabel>
                 <FormControl>
@@ -94,7 +94,8 @@ const AuthForm = ({
                       <input
                         type="radio"
                         value="USER"
-                        {...field} // This already includes `value`
+                        checked={field.value === "USER"} // Manually bind `checked`
+                        onChange={() => field.onChange("USER")} // Manually bind `onChange`
                         className="form-radio"
                       />
                       User
@@ -103,7 +104,8 @@ const AuthForm = ({
                       <input
                         type="radio"
                         value="ADMIN"
-                        {...field} // This already includes `value`
+                        checked={field.value === "ADMIN"} // Manually bind `checked`
+                        onChange={() => field.onChange("ADMIN")} // Manually bind `onChange`
                         className="form-radio"
                       />
                       Admin

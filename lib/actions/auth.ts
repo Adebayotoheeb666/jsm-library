@@ -3,15 +3,14 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/database/drizzle";
 import { users } from "@/database/schema";
-import { hash } from "bcryptjs";
-import { signIn } from "@/auth";
+import { hash, compare } from "bcryptjs";
+import { signIn } from "next-auth/react";
 import { headers } from "next/headers";
 import ratelimit from "@/lib/ratelimit";
 import { redirect } from "next/navigation";
 import { workflowClient } from "@/lib/workflow";
 import config from "@/lib/config";
 import { AuthCredentials } from "@/types";
-
 
 export const signInWithCredentials = async (
   params: Pick<AuthCredentials, "email" | "password">,
@@ -24,20 +23,21 @@ export const signInWithCredentials = async (
   if (!success) return redirect("/too-fast");
 
   try {
-    const result: { error?: string } = await signIn("credentials", {
+    const result = await signIn("credentials", {
       email,
       password,
       redirect: true,
+      callbackUrl: "/admin",
     });
 
     if (result?.error) {
-
-      return { success: false, error: result.error };
+      console.error(result.error);
+      return { success: false, error: result.error, status: result.status };
     }
 
     return { success: true };
   } catch (error) {
-    console.log(error, "Signin error");
+    console.error(error, "Signin error");
     return { success: false, error: "Signin error" };
   }
 };
@@ -55,7 +55,6 @@ export const signUp = async (params: AuthCredentials & { role: "USER" | "ADMIN" 
     .from(users)
     .where(eq(users.email, email));
 
-
   if (existingUser.length > 0) {
     return { success: false, error: "User already exists" };
   }
@@ -64,14 +63,10 @@ export const signUp = async (params: AuthCredentials & { role: "USER" | "ADMIN" 
 
   try {
     await db.insert(users).values({
-      fullName,
+      name: fullName,
       email,
-      universityId,
       password: hashedPassword,
-      universityCard,
-      role,
     });
-
 
     await workflowClient.trigger({
       url: `${config.env.prodApiEndpoint}/api/workflows/onboarding`,
@@ -81,12 +76,11 @@ export const signUp = async (params: AuthCredentials & { role: "USER" | "ADMIN" 
       },
     });
 
-    
     await signInWithCredentials({ email, password });
 
     return { success: true };
   } catch (error) {
-    console.log(error, "Signup error");
+    console.error(error, "Signup error");
     return { success: false, error: "Signup error" };
   }
 };
