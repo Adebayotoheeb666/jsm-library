@@ -10,6 +10,8 @@ import ratelimit from "@/lib/ratelimit";
 import { redirect } from "next/navigation";
 import { workflowClient } from "@/lib/workflow";
 import config from "@/lib/config";
+import { AuthCredentials } from "@/types";
+
 
 export const signInWithCredentials = async (
   params: Pick<AuthCredentials, "email" | "password">,
@@ -22,13 +24,14 @@ export const signInWithCredentials = async (
   if (!success) return redirect("/too-fast");
 
   try {
-    const result = await signIn("credentials", {
+    const result: { error?: string } = await signIn("credentials", {
       email,
       password,
-      redirect: false,
+      redirect: true,
     });
 
     if (result?.error) {
+
       return { success: false, error: result.error };
     }
 
@@ -39,8 +42,8 @@ export const signInWithCredentials = async (
   }
 };
 
-export const signUp = async (params: AuthCredentials) => {
-  const { fullName, email, universityId, password, universityCard } = params;
+export const signUp = async (params: AuthCredentials & { role: "USER" | "ADMIN" }) => {
+  const { fullName, email, universityId, password, universityCard, role } = params;
 
   const ip = (await headers()).get("x-forwarded-for") || "127.0.0.1";
   const { success } = await ratelimit.limit(ip);
@@ -50,8 +53,8 @@ export const signUp = async (params: AuthCredentials) => {
   const existingUser = await db
     .select()
     .from(users)
-    .where(eq(users.email, email))
-    .limit(1);
+    .where(eq(users.email, email));
+
 
   if (existingUser.length > 0) {
     return { success: false, error: "User already exists" };
@@ -66,7 +69,9 @@ export const signUp = async (params: AuthCredentials) => {
       universityId,
       password: hashedPassword,
       universityCard,
+      role,
     });
+
 
     await workflowClient.trigger({
       url: `${config.env.prodApiEndpoint}/api/workflows/onboarding`,

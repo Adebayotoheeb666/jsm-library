@@ -45,6 +45,7 @@ export const FIELD_NAMES = {
   email: "Email",
   universityId: "University ID Number",
   password: "Password",
+  role: "Role",
   universityCard: "Upload University ID Card",
 };
 
@@ -52,6 +53,7 @@ export const FIELD_TYPES = {
   fullName: "text",
   email: "email",
   universityId: "number",
+  role: "text",
   password: "password",
 };
 
@@ -190,3 +192,5 @@ export const sampleBooks = [
       "Morgan Housel explores the unique behaviors and mindsets that shape financial success and decision-making.",
   },
 ];
+
+

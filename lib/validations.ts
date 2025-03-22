@@ -1,16 +1,20 @@
 import { z } from "zod";
 
+const ROLE_ENUM = z.enum(["USER", "ADMIN"]);
+
 export const signUpSchema = z.object({
   fullName: z.string().min(3),
   email: z.string().email(),
+  role: ROLE_ENUM, // Add validation for user role
   universityId: z.coerce.number(),
   universityCard: z.string().nonempty("University Card is required"),
   password: z.string().min(8),
 });
 
 export const signInSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  role: z.enum(["USER", "ADMIN"]), // Add the `role` field
 });
 
 export const bookSchema = z.object({

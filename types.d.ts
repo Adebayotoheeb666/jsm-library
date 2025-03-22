@@ -1,3 +1,5 @@
+import { ZodType } from "zod";
+
 interface Book {
   id: string;
   title: string;
@@ -13,6 +15,20 @@ interface Book {
   summary: string;
 }
 
+interface FormValues {
+  email: string;
+  password: string;
+  role: "USER" | "ADMIN";
+  universityCard?: string; // Optional field for file upload
+}
+
+interface Props {
+  session?: any; // Replace `any` with a proper type if possible
+  schema: ZodType<FormValues>;
+  defaultValues: FormValues;
+  onSubmit: (data: FormValues) => Promise<{ success: boolean; error?: string }>;
+  type: "SIGN_IN" | "SIGN_UP";
+}
 
 interface AuthCredentials {
   fullName: string;
