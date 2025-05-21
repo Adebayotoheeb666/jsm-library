@@ -84,7 +84,7 @@ Make sure you have the following installed on your machine:
 **Cloning the Repository**
 
 ```bash
-git clone https://github.com/adrianhajdin/university-library-jsm.git
+git clone https://github.com/Adebayotoheeb666/jsm-library.git
 cd university-library-jsm
 ```
 
